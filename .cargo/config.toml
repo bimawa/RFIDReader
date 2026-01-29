@@ -1,0 +1,14 @@
+[target.xtensa-esp32s3-none-elf]
+runner = "espflash flash --monitor"
+linker = "xtensa-esp32s3-elf-gcc"
+
+[env]
+ESP_LOG = "info"
+LIBCLANG_PATH = "/Users/bimawa/.rustup/toolchains/esp/xtensa-esp32-elf-clang/esp-18.1.2_20240912/esp-clang/lib"
+
+[build]
+rustflags = ["-C", "link-arg=-nostartfiles", "-C", "link-arg=-Tlinkall.x"]
+target = "xtensa-esp32s3-none-elf"
+
+[unstable]
+build-std = ["core", "alloc"]
