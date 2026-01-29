@@ -19,6 +19,7 @@ use esp_hal::{
     gpio::{Input, InputConfig, Level, Output, OutputConfig, Pull},
     i2c::master::I2c,
     i2s::master::{Channels, Config as I2sConfig, DataFormat, I2s},
+    rtc_cntl::Rtc,
     spi::master::Spi,
     time::Rate,
     usb_serial_jtag::UsbSerialJtag,
@@ -84,11 +85,14 @@ fn main() -> ! {
     let mut delay = Delay::new();
 
     info!("Init power enable (GPIO15)...");
-    let _pwr_en = Output::new(peripherals.GPIO15, Level::High, OutputConfig::default());
+    let mut pwr_en = Output::new(peripherals.GPIO15, Level::High, OutputConfig::default());
 
     info!("Init backlight...");
-    let _bl = Output::new(peripherals.GPIO21, Level::High, OutputConfig::default());
+    let mut backlight = Output::new(peripherals.GPIO21, Level::High, OutputConfig::default());
     delay.delay_millis(100);
+
+    info!("Init RTC for deep sleep...");
+    let mut rtc = Rtc::new(peripherals.LPWR);
 
     info!("Init SPI...");
 
@@ -508,9 +512,10 @@ fn main() -> ! {
                     }
                     5 => {
                         display.show_status("Goodbye!");
-                        loop {
-                            core::hint::spin_loop();
-                        }
+                        delay.delay_millis(500);
+                        backlight.set_low();
+                        pwr_en.set_low();
+                        rtc.sleep_deep(&[]);
                     }
                     _ => {}
                 },
