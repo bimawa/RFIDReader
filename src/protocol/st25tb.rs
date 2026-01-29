@@ -13,7 +13,7 @@ const CMD_COMPLETION: u8 = 0x0F;
 pub struct ChipData {
     pub chip_id: u8,
     pub uid: [u8; 8],
-    pub blocks: [[u8; 4]; 128],
+    pub blocks: [[u8; 4]; 256],
     pub block_count: usize,
 }
 
@@ -22,7 +22,7 @@ impl Default for ChipData {
         Self {
             chip_id: 0,
             uid: [0u8; 8],
-            blocks: [[0u8; 4]; 128],
+            blocks: [[0u8; 4]; 256],
             block_count: 0,
         }
     }
@@ -159,8 +159,8 @@ where
             ..Default::default()
         };
 
-        for i in 0..128u8 {
-            match self.read_block(i) {
+        for i in 0u16..256 {
+            match self.read_block(i as u8) {
                 Ok(block) => {
                     data.blocks[i as usize] = block;
                     data.block_count = (i + 1) as usize;

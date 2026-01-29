@@ -406,7 +406,7 @@ fn main() -> ! {
                                                 let block_idx = ((h1 as usize) * 100)
                                                     + ((h2 as usize) * 10)
                                                     + (h3 as usize);
-                                                if block_idx < 128 {
+                                                if block_idx < 256 {
                                                     let hex_start = line_buf
                                                         .iter()
                                                         .position(|&x| x == b':')

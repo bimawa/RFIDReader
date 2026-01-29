@@ -8,7 +8,7 @@ A Rust firmware for reading and writing **ST25TB RFID chips** (commonly used in 
 
 ## Features
 
-- **Read ST25TB chips** - Full chip dump (all 128 blocks)
+- **Read ST25TB chips** - Full chip dump (up to 256 blocks)
 - **Write ST25TB chips** - Write modified data back to chip
 - **Serial Dump** - Export chip data via serial monitor
 - **Serial Load** - Import chip data by pasting hex dump
