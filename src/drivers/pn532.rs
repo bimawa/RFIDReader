@@ -124,9 +124,7 @@ where
     }
 
     fn delay_ms(&self, ms: u32) {
-        for _ in 0..(ms * 10000) {
-            core::hint::spin_loop();
-        }
+        esp_hal::rom::ets_delay_us(ms * 1000);
     }
 
     pub fn get_firmware_version(&mut self) -> Result<(u8, u8, u8), Pn532Error> {

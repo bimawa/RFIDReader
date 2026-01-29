@@ -44,9 +44,7 @@ where
     }
 
     fn delay_ms(&self, ms: u32) {
-        for _ in 0..(ms * 10000) {
-            core::hint::spin_loop();
-        }
+        esp_hal::rom::ets_delay_us(ms * 1000);
     }
 
     pub fn initiate(&mut self, force: bool) -> Result<u8, Pn532Error> {
