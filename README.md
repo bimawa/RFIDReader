@@ -6,6 +6,19 @@ A Rust firmware for reading and writing **ST25TB RFID chips** (commonly used in 
 ![Platform](https://img.shields.io/badge/platform-ESP32--S3-green.svg)
 ![Language](https://img.shields.io/badge/language-Rust-orange.svg)
 
+## Photos
+
+<p align="center">
+  <img src="docs/img/img1.jpg" width="280" alt="Menu Screen">
+  &nbsp;&nbsp;&nbsp;
+  <img src="docs/img/img2.jpg" width="280" alt="Data View">
+</p>
+<p align="center">
+  <em>Menu Screen</em>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <em>Chip Data View</em>
+</p>
+
 ## Features
 
 - **Read ST25TB chips** - Full chip dump (up to 256 blocks)
