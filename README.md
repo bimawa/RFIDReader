@@ -96,6 +96,22 @@ cargo espflash flash --port /dev/cu.usbmodem1201 --release
 espflash monitor --port /dev/cu.usbmodem1201 --non-interactive
 ```
 
+## Releases
+
+Pre-built binaries are available in [Releases](https://github.com/aspect-apps/RFIDReader/releases):
+
+| File | Description |
+|------|-------------|
+| `rfid-reader.bin` | App binary for [mLauncher](https://github.com/aspect-apps/mLauncher) bootloader |
+| `rfid-reader-full.bin` | Full firmware with bootloader (flash at 0x0) |
+
+**Using mLauncher:** Copy `rfid-reader.bin` to SD card, select from mLauncher menu.
+
+**Standalone flash:**
+```bash
+esptool.py write_flash 0x0 rfid-reader-full.bin
+```
+
 ## Usage
 
 ### Menu Navigation
