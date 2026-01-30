@@ -111,25 +111,35 @@ where
 
             for b in 0..4 {
                 let x = 28 + (b as i32) * 18;
-                
+
                 if is_selected && edit_mode && b == selected_byte {
                     let high_nibble = (block[b] >> 4) & 0x0F;
                     let low_nibble = block[b] & 0x0F;
-                    
+
                     let mut high_str: String<2> = String::new();
                     let mut low_str: String<2> = String::new();
                     let _ = write!(high_str, "{:X}", high_nibble);
                     let _ = write!(low_str, "{:X}", low_nibble);
-                    
-                    let high_style = if selected_nibble == 0 { edit_style } else { selected_style };
-                    let low_style = if selected_nibble == 1 { edit_style } else { selected_style };
-                    
-                    let _ = Text::new(&high_str, Point::new(x, y), high_style).draw(&mut self.driver);
-                    let _ = Text::new(&low_str, Point::new(x + 6, y), low_style).draw(&mut self.driver);
+
+                    let high_style = if selected_nibble == 0 {
+                        edit_style
+                    } else {
+                        selected_style
+                    };
+                    let low_style = if selected_nibble == 1 {
+                        edit_style
+                    } else {
+                        selected_style
+                    };
+
+                    let _ =
+                        Text::new(&high_str, Point::new(x, y), high_style).draw(&mut self.driver);
+                    let _ =
+                        Text::new(&low_str, Point::new(x + 6, y), low_style).draw(&mut self.driver);
                 } else {
                     let mut byte_str: String<4> = String::new();
                     let _ = write!(byte_str, "{:02X}", block[b]);
-                    
+
                     let byte_style = if is_selected && !edit_mode {
                         selected_style
                     } else if block == &[0xFF, 0xFF, 0xFF, 0xFF] {
@@ -137,8 +147,9 @@ where
                     } else {
                         normal_style
                     };
-                    
-                    let _ = Text::new(&byte_str, Point::new(x, y), byte_style).draw(&mut self.driver);
+
+                    let _ =
+                        Text::new(&byte_str, Point::new(x, y), byte_style).draw(&mut self.driver);
                 }
             }
 
