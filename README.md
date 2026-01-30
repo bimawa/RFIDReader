@@ -105,7 +105,7 @@ Pre-built binaries are available in [Releases](https://github.com/aspect-apps/RF
 | `rfid-reader.bin` | App binary for [Launcher](https://github.com/bmorcelli/Launcher) bootloader |
 | `rfid-reader-full.bin` | Full firmware with bootloader (flash at 0x0) |
 
-**Using mLauncher:** Copy `rfid-reader.bin` to SD card, select from mLauncher menu.
+**Using Launcher:** Copy `rfid-reader.bin` to SD card, select from Launcher menu SD. Firmware app and reboot.
 
 **Standalone flash:**
 ```bash
