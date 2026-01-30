@@ -273,6 +273,7 @@ fn main() -> ! {
                             &ed.data,
                             ed.selected_block,
                             ed.selected_byte,
+                            ed.selected_nibble,
                             ed.edit_mode,
                             false,
                         );
@@ -310,6 +311,7 @@ fn main() -> ! {
                                             &ed.data,
                                             ed.selected_block,
                                             ed.selected_byte,
+                                            ed.selected_nibble,
                                             ed.edit_mode,
                                             true,
                                         );
@@ -501,6 +503,7 @@ fn main() -> ! {
                                 &ed.data,
                                 ed.selected_block,
                                 ed.selected_byte,
+                                ed.selected_nibble,
                                 ed.edit_mode,
                                 true,
                             );
@@ -526,6 +529,7 @@ fn main() -> ! {
                             &ed.data,
                             ed.selected_block,
                             ed.selected_byte,
+                            ed.selected_nibble,
                             ed.edit_mode,
                             false,
                         );
@@ -554,6 +558,7 @@ fn main() -> ! {
                                 &ed.data,
                                 ed.selected_block,
                                 ed.selected_byte,
+                                ed.selected_nibble,
                                 ed.edit_mode,
                                 false,
                             );

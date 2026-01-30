@@ -41,7 +41,11 @@ impl ChipEditor {
             self.selected_byte = 0;
             self.selected_nibble = 0;
         } else {
-            self.next_byte();
+            if self.selected_nibble == 0 {
+                self.selected_nibble = 1;
+            } else {
+                self.next_byte();
+            }
         }
     }
 
