@@ -73,6 +73,24 @@ const MENU_ITEMS: [&str; 6] = [
     "Exit",
 ];
 
+
+// Custom wake source for GPIO6 (back button)
+struct Gpio6WakeSource;
+
+impl esp_hal::rtc_cntl::sleep::WakeSource for Gpio6WakeSource {
+    fn apply(
+        &self,
+        _rtc: &esp_hal::rtc_cntl::Rtc<'_>,
+        triggers: &mut esp_hal::rtc_cntl::sleep::WakeTriggers,
+        sleep_config: &mut esp_hal::rtc_cntl::sleep::RtcSleepConfig,
+    ) {
+        // Don't power down RTC peripherals
+        sleep_config.set_rtc_peri_pd_en(false);
+        // Enable EXT0 trigger
+        triggers.set_ext0(true);
+    }
+}
+
 #[esp_hal::main]
 fn main() -> ! {
     esp_alloc::heap_allocator!(size: 32 * 1024);
@@ -93,6 +111,45 @@ fn main() -> ! {
 
     info!("Init RTC for deep sleep...");
     let mut rtc = Rtc::new(peripherals.LPWR);
+
+    // Check if we woke from deep sleep - require button to be HELD
+    {
+        use esp_hal::rtc_cntl::SocResetReason;
+        let reset_reason = esp_hal::rtc_cntl::reset_reason(esp_hal::system::Cpu::ProCpu);
+        
+        if reset_reason == Some(SocResetReason::CoreDeepSleep) {
+            info!("Woke from deep sleep, checking if BACK button is held...");
+            
+            // Quick check GPIO6 state
+            let gpio6_is_low = unsafe {
+                use esp_hal::peripherals::GPIO;
+                let gpio = &*GPIO::ptr();
+                (gpio.in_().read().bits() & (1 << 6)) == 0
+            };
+            
+            if !gpio6_is_low {
+                info!("BACK button not held, going back to sleep...");
+                // Go back to sleep immediately
+                unsafe {
+                    use esp_hal::peripherals::{RTC_IO, LPWR, SENS};
+                    (*SENS::ptr()).sar_peri_clk_gate_conf().modify(|_, w| w.iomux_clk_en().set_bit());
+                    let rtc_io = &*RTC_IO::ptr();
+                    rtc_io.touch_pad(6).modify(|_, w| {
+                        w.mux_sel().set_bit();
+                        w.fun_sel().bits(0);
+                        w.fun_ie().set_bit();
+                        w.rue().set_bit();
+                        w.rde().clear_bit()
+                    });
+                    rtc_io.ext_wakeup0().modify(|_, w| w.sel().bits(6));
+                    let rtc_cntl = &*LPWR::ptr();
+                    rtc_cntl.ext_wakeup_conf().modify(|_, w| w.ext_wakeup0_lv().clear_bit());
+                }
+                rtc.sleep_deep(&[&Gpio6WakeSource]);
+            }
+            info!("BACK button is held! Waking up...");
+        }
+    }
 
     info!("Init SPI...");
 
@@ -514,11 +571,40 @@ fn main() -> ! {
                         }
                     }
                     5 => {
-                        display.show_status("Goodbye!");
-                        delay.delay_millis(500);
+                        display.show_status("Hold BACK to wake");
+                        delay.delay_millis(1000);
                         backlight.set_low();
                         pwr_en.set_low();
-                        rtc.sleep_deep(&[]);
+                        
+                        // Configure GPIO6 as EXT0 wake source
+                        unsafe {
+                            use esp_hal::peripherals::{RTC_IO, LPWR, SENS};
+                            
+                            // Enable RTC IO clock
+                            (*SENS::ptr()).sar_peri_clk_gate_conf().modify(|_, w| w.iomux_clk_en().set_bit());
+                            
+                            let rtc_io = &*RTC_IO::ptr();
+                            
+                            // Configure GPIO6 (touch_pad6) for RTC function with input enabled
+                            rtc_io.touch_pad(6).modify(|_, w| {
+                                w.mux_sel().set_bit();  // Route to RTC
+                                w.fun_sel().bits(0);    // RTC function
+                                w.fun_ie().set_bit();   // Input enable
+                                w.rue().set_bit();      // Pull-up enable
+                                w.rde().clear_bit()     // Pull-down disable
+                            });
+                            
+                            // Set EXT0 wake source to GPIO6 (RTC number 6)
+                            rtc_io.ext_wakeup0().modify(|_, w| w.sel().bits(6));
+                            
+                            let rtc_cntl = &*LPWR::ptr();
+                            // Wake on LOW level (button pressed)
+                            rtc_cntl.ext_wakeup_conf().modify(|_, w| w.ext_wakeup0_lv().clear_bit());
+                            
+                            // Don't power down RTC peripherals, enable EXT0 wakeup
+                        }
+                        
+                        rtc.sleep_deep(&[&Gpio6WakeSource]);
                     }
                     _ => {}
                 },
